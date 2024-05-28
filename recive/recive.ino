@@ -1,12 +1,17 @@
 #include <LoRa.h>
+#include "BluetoothSerial.h"
 
-#define SS 5
+#define SS 5  
 #define RST 14  
-#define DIO0 2 
+#define DIO0 2  
+
+BluetoothSerial SerialBT;
 
 void setup() {
   Serial.begin(9600);
+  SerialBT.begin("BT-Node-2"); // Bluetooth device name
   while (!Serial);
+
   Serial.println("Sender Host");
 
   LoRa.setPins(SS, RST, DIO0);
@@ -22,6 +27,11 @@ void loop() {
     sendMessage(dataToSend);
   }
 
+  if (SerialBT.available()) {
+    String dataToSend = SerialBT.readString();
+    sendMessage(dataToSend);
+  }
+
   if (LoRa.parsePacket()) {
     String receivedMessage = "";
     while (LoRa.available()) {
@@ -29,12 +39,16 @@ void loop() {
     }
     Serial.print("Received: ");
     Serial.println(receivedMessage);
+    SerialBT.print("Received: ");
+    SerialBT.println(receivedMessage);
   }
 }
 
 void sendMessage(String message) {
   Serial.print("Sending: ");
   Serial.println(message);
+  SerialBT.print("Sending: ");
+  SerialBT.println(message);
   LoRa.beginPacket();
   LoRa.print(message);
   LoRa.endPacket();
