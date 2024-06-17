@@ -35,7 +35,7 @@ void loop() {
   if (LoRa.parsePacket()) {
     String receivedMessage = "";
     while (LoRa.available()) {
-      receivedMessage += (char)LoRa.read();
+      receivedMessage += (char)LoRa.read(); //reading from lora buffer, casting to char and concatinating into string
     }
     Serial.print("Received: ");
     Serial.println(receivedMessage);
